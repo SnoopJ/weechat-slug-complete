@@ -148,18 +148,13 @@ def modify_message(data, modifier, modifier_data, msg):
     idx = msg.index(':') + 1
     cmd, text = msg[:idx], msg[idx:]
 
-    maybe_slugs = list(re.finditer(r":\S+?:", text))
-    for m in maybe_slugs:
-        slug = m.group()
-        start, end = m.span()
-        if slug.startswith("::"):
-            text = text[:start] + slug.replace("::", ":") + text[end:]
+    def _replace(match):
+        if match:
+            slug = match.group(0)
+            return KNOWN_SLUGS.get(slug, slug)
         else:
-            slug = slug.replace("::", ":")
-            if slug in KNOWN_SLUGS:
-                repl = KNOWN_SLUGS[slug]
-                text = text[:start] + repl + text[end:]
+            return None
 
-    newmsg = cmd + text
+    newmsg = cmd + re.sub(r":[\w-]+?:", _replace, text)
 
     return newmsg
