@@ -83,7 +83,8 @@ def _show_matches(matches, buffer):
 
     output = []
     for num, (slug, replacement) in enumerate(matches):
-        field = f"{replacement}\t{slug}"
+        repl = replacement[:32] + ("…" if len(replacement) > 32 else "")
+        field = f"{repl}\t{slug}"
         output.append(f"{field:<{longest_slug_len+2}}")
         if num % num_wide == 0:
             weechat.prnt(buffer, "".join(output))
